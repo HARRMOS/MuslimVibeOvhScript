@@ -19,7 +19,7 @@ def get_videos():
         cursor = conn.cursor(dictionary=True)
         
         # Exécuter la requête SQL
-        cursor.execute("SELECT * FROM `MuslimVibe`")  # Remplace `MuslimVibe` par le nom de ta table si nécessaire
+        cursor.execute("SELECT * FROM `islamic_content`")  # Remplace `MuslimVibe` par le nom de ta table si nécessaire
         results = cursor.fetchall()
         
         # Fermer la connexion
