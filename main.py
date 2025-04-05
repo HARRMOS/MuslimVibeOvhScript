@@ -5,19 +5,33 @@ app = Flask(__name__)
 
 @app.route("/getVideos")
 def get_videos():
-    conn = mysql.connector.connect(
-        host="mh285989-001.eu.clouddb.ovh.net",
-        user="bts",
-        password="Harris91270",
-        database="MuslimVibe"
-    )
+    try:
+        # Connexion à la base de données
+        conn = mysql.connector.connect(
+            host="mh285989-001.eu.clouddb.ovh.net",
+            port=35693,  # Spécifier le port ici
+            user="bts",
+            password="Harris91270",
+            database="MuslimVibe"
+        )
 
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM `MuslimVibe`")
-    results = cursor.fetchall()
-    conn.close()
+        # Créer un curseur pour interroger la base de données
+        cursor = conn.cursor(dictionary=True)
+        
+        # Exécuter la requête SQL
+        cursor.execute("SELECT * FROM `MuslimVibe`")  # Remplace `MuslimVibe` par le nom de ta table si nécessaire
+        results = cursor.fetchall()
+        
+        # Fermer la connexion
+        conn.close()
 
-    return jsonify(results)
+        # Retourner les résultats sous forme de JSON
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        # Gestion des erreurs de connexion
+        return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
 
 if __name__ == "__main__":
+    # Lancer l'application Flask
     app.run(debug=True, host="0.0.0.0", port=6000)
