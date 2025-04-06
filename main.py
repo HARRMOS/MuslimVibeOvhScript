@@ -3,6 +3,9 @@ import mysql.connector
 
 app = Flask(__name__)
 
+class LikeRequest(BaseModel):
+    userId: int
+
 # Connexion à la base de données
 def get_db_connection():
     return mysql.connector.connect(
