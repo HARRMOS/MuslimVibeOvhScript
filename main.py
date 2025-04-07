@@ -52,9 +52,10 @@ def get_video_count(user_id):
         
         # Exécuter la requête SQL pour obtenir le nombre de vidéos par utilisateur
         cursor.execute("""
-            SELECT COUNT(*) AS video_count 
+             SELECT video_id, COUNT(*) AS video_count 
             FROM islamic_content 
             WHERE user_id = %s
+            GROUP BY video_id
         """, (user_id,))
         
         # Récupérer le résultat
