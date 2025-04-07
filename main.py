@@ -66,7 +66,7 @@ def get_user_videos(user_id):
 
 # Route pour récupérer le nombre de vidéos par utilisateur
 @app.route("/user/<int:user_id>/video_count", methods=["GET"])
-def get_user_videos(user_id):
+def Count_user_videos(user_id):
     try:
         # Connexion à la base de données
         conn = get_db_connection()
