@@ -4,4 +4,5 @@ aiomysql==0.1.1
 mysql-connector-python==8.0.33
 flask
 python-swiftclient
+gunicorn
 python-keystoneclient
