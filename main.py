@@ -135,6 +135,5 @@ def upload():
         return jsonify({"error": f"Erreur lors de l'upload: {str(e)}"}), 500
 
 # -------------------- Run --------------------
-
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8000)
