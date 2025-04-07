@@ -38,8 +38,9 @@ def get_videos():
         return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
 
 # Route pour récupérer toutes les vidéos
+# Route pour récupérer toutes les vidéos d’un utilisateur
 @app.route("/getUserVideos/user/<int:user_id>")
-def get_videos():
+def get_user_videos(user_id):
     try:
         # Connexion à la base de données
         conn = get_db_connection()
@@ -47,11 +48,12 @@ def get_videos():
         # Créer un curseur pour interroger la base de données
         cursor = conn.cursor(dictionary=True)
         
-        # Exécuter la requête SQL pour récupérer toutes les vidéos
-        cursor.execute("SELECT * FROM `islamic_content` WHERE user_id = %s"),(user_id,))
+        # Exécuter la requête SQL pour récupérer les vidéos de l'utilisateur
+        cursor.execute("SELECT * FROM `islamic_content` WHERE user_id = %s", (user_id,))
         results = cursor.fetchall()
         
-        # Fermer la connexion
+        # Fermer le curseur et la connexion
+        cursor.close()
         conn.close()
 
         # Retourner les résultats sous forme de JSON
