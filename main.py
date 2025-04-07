@@ -37,6 +37,30 @@ def get_videos():
         # Gestion des erreurs de connexion
         return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
 
+# Route pour récupérer toutes les vidéos
+@app.route("/getUserVideos/user/<int:user_id>")
+def get_videos():
+    try:
+        # Connexion à la base de données
+        conn = get_db_connection()
+
+        # Créer un curseur pour interroger la base de données
+        cursor = conn.cursor(dictionary=True)
+        
+        # Exécuter la requête SQL pour récupérer toutes les vidéos
+        cursor.execute("SELECT * FROM `islamic_content` WHERE user_id = %s"),(user_id,))
+        results = cursor.fetchall()
+        
+        # Fermer la connexion
+        conn.close()
+
+        # Retourner les résultats sous forme de JSON
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        # Gestion des erreurs de connexion
+        return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
+
 
 # Route pour récupérer le nombre de vidéos par utilisateur
 @app.route("/user/<int:user_id>/video_count", methods=["GET"])
@@ -50,7 +74,7 @@ def get_user_videos(user_id):
         
         # Exécuter la requête SQL pour obtenir les IDs des vidéos publiées par l'utilisateur
         cursor.execute("""
-            SELECT id,file_name 
+            SELECT id 
             FROM islamic_content 
             WHERE user_id = %s
         """, (user_id,))
