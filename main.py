@@ -58,16 +58,16 @@ def get_video_count(user_id):
             GROUP BY video_id
         """, (user_id,))
         
-        # Récupérer le résultat
-        result = cursor.fetchone()
+       # Récupérer les résultats
+        results = cursor.fetchall()
         
         # Fermer la connexion
         conn.close()
 
         # Vérifier si des vidéos ont été trouvées pour l'utilisateur
-        if result:
-             return jsonify({"user_id": user_id, "videos": results})
-        else:        else:
+        if results:
+            return jsonify({"user_id": user_id, "videos": results})
+        else:
             return jsonify({"error": "Utilisateur non trouvé ou aucune vidéo disponible"}), 404
     
     except mysql.connector.Error as e:
