@@ -40,7 +40,7 @@ def get_videos():
 
 # Route pour récupérer le nombre de vidéos par utilisateur
 @app.route("/user/<int:user_id>/video_count", methods=["GET"])
-def get_video_count(user_id):
+def get_user_videos(user_id):
     try:
         # Connexion à la base de données
         conn = get_db_connection()
@@ -48,12 +48,11 @@ def get_video_count(user_id):
         # Créer un curseur pour interroger la base de données
         cursor = conn.cursor(dictionary=True)
         
-        # Exécuter la requête SQL pour obtenir le nombre de vidéos par utilisateur
+        # Exécuter la requête SQL pour obtenir les IDs des vidéos publiées par l'utilisateur
         cursor.execute("""
-            SELECT id, COUNT(*) AS video_count 
+            SELECT id 
             FROM islamic_content 
             WHERE user_id = %s
-            GROUP BY id
         """, (user_id,))
         
         # Récupérer les résultats
@@ -64,13 +63,20 @@ def get_video_count(user_id):
 
         # Vérifier si des vidéos ont été trouvées pour l'utilisateur
         if results:
-            return jsonify({"user_id": user_id, "videos": results})
+            # Extraire les IDs des vidéos
+            video_ids = [video['id'] for video in results]
+            return jsonify({
+                "user_id": user_id,
+                "total_video_count": len(video_ids),
+                "video_ids": video_ids
+            })
         else:
             return jsonify({"error": "Utilisateur non trouvé ou aucune vidéo disponible"}), 404
     
     except mysql.connector.Error as e:
         # Gestion des erreurs de connexion
         return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
+
 
 
 # Endpoint pour liker / déliker
