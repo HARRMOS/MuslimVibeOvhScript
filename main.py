@@ -50,7 +50,7 @@ def get_user_videos(user_id):
         
         # Exécuter la requête SQL pour obtenir les IDs des vidéos publiées par l'utilisateur
         cursor.execute("""
-            SELECT id 
+            SELECT id,file_name 
             FROM islamic_content 
             WHERE user_id = %s
         """, (user_id,))
