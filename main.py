@@ -66,8 +66,8 @@ def get_video_count(user_id):
 
         # Vérifier si des vidéos ont été trouvées pour l'utilisateur
         if result:
-            return jsonify({"user_id": user_id, "video_count": result["video_count"]})
-        else:
+             return jsonify({"user_id": user_id, "videos": results})
+        else:        else:
             return jsonify({"error": "Utilisateur non trouvé ou aucune vidéo disponible"}), 404
     
     except mysql.connector.Error as e:
