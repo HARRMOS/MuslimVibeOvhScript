@@ -55,7 +55,7 @@ def get_video_count(user_id):
              SELECT video_id, COUNT(*) AS video_count 
             FROM islamic_content 
             WHERE user_id = %s
-            GROUP BY video_id
+            GROUP BY id
         """, (user_id,))
         
        # Récupérer les résultats
