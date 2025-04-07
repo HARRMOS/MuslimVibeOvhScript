@@ -67,13 +67,8 @@ def get_likes(content_id):
     
     return jsonify({"count": count})
 
-from flask import Flask, jsonify
-import mysql.connector
 
-app = Flask(__name__)
 
-class LikeRequest(BaseModel):
-    userId: int
 
 @app.route("/getVideos")
 def get_videos():
