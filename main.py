@@ -67,24 +67,83 @@ def get_likes(content_id):
     
     return jsonify({"count": count})
 
-# Endpoint pour récupérer toutes les vidéos
-@app.route("/getVideos", methods=["GET"])
+from flask import Flask, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+
+class LikeRequest(BaseModel):
+    userId: int
+
+@app.route("/getVideos")
 def get_videos():
     try:
-        conn = get_db_connection()
+        # Connexion à la base de données
+        conn = mysql.connector.connect(
+            host="mh285989-001.eu.clouddb.ovh.net",
+            port=35693,  # Spécifier le port ici
+            user="bts",
+            password="Harris91270",
+            database="MuslimVibe"
+        )
+
+        # Créer un curseur pour interroger la base de données
         cursor = conn.cursor(dictionary=True)
         
-        # Récupérer les vidéos
-        cursor.execute("SELECT * FROM islamic_content")
+        # Exécuter la requête SQL
+        cursor.execute("SELECT * FROM `islamic_content`")  # Remplace `MuslimVibe` par le nom de ta table si nécessaire
         results = cursor.fetchall()
-
-        cursor.close()
+        
+        # Fermer la connexion
         conn.close()
 
+        # Retourner les résultats sous forme de JSON
         return jsonify(results)
     
     except mysql.connector.Error as e:
+        # Gestion des erreurs de connexion
+        return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
+
+
+# Route pour récupérer le nombre de vidéos par utilisateur
+@app.route("/user/<int:user_id>/video_count", methods=["GET"])
+def get_video_count(user_id):
+    try:
+        # Connexion à la base de données
+        conn = mysql.connector.connect(
+            host="mh285989-001.eu.clouddb.ovh.net",
+            port=35693,  # Spécifier le port ici
+            user="bts",
+            password="Harris91270",
+            database="MuslimVibe"
+        )
+
+        # Créer un curseur pour interroger la base de données
+        cursor = conn.cursor(dictionary=True)
+        
+        # Exécuter la requête SQL pour obtenir le nombre de vidéos par utilisateur
+        cursor.execute("""
+            SELECT COUNT(*) AS video_count 
+            FROM islamic_content 
+            WHERE user_id = %s
+        """, (user_id,))
+        
+        # Récupérer le résultat
+        result = cursor.fetchone()
+        
+        # Fermer la connexion
+        conn.close()
+
+        # Vérifier si des vidéos ont été trouvées pour l'utilisateur
+        if result:
+            return jsonify({"user_id": user_id, "video_count": result["video_count"]})
+        else:
+            return jsonify({"error": "Utilisateur non trouvé ou aucune vidéo disponible"}), 404
+    
+    except mysql.connector.Error as e:
+        # Gestion des erreurs de connexion
         return jsonify({"error": f"Erreur lors de la connexion à la base de données: {str(e)}"}), 500
 
 if __name__ == "__main__":
+    # Lancer l'application Flask
     app.run(debug=True, host="0.0.0.0", port=6000)
