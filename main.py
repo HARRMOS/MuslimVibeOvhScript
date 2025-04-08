@@ -14,7 +14,9 @@ def get_db_connection():
         password="Harris91270",
         database="MuslimVibe"
     )
-
+@app.route("/")
+def home():
+    return "✅ L'application Flask fonctionne !"
 # Route pour récupérer toutes les vidéos
 @app.route("/getVideos")
 def get_videos():
