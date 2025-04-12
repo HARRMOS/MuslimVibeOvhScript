@@ -130,7 +130,7 @@ def upload():
 
     try:
         conn = get_ovh_connection()
-        container = "Muslim.Vibes/Videos"
+        container = "Muslim.Vibes/Contents"
         conn.put_object(container, filename, contents=content)
         return jsonify({"message": f"Fichier {filename} envoyé avec succès à OVH."})
     except Exception as e:
