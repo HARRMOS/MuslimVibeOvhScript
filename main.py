@@ -14,9 +14,7 @@ def get_db_connection():
         password="Harris91270",
         database="MuslimVibe"
     )
-@app.route("/")
-def home():
-    return "✅ L'application Flask fonctionne !"
+
 # Route pour récupérer toutes les vidéos
 @app.route("/getVideos")
 def get_videos():
@@ -102,8 +100,13 @@ def get_likes(content_id):
     conn.close()
     return jsonify({"count": count})
 
-# -------------------- Upload OVH --------------------
+import swiftclient
+import mysql.connector
+from flask import Flask, request, jsonify
 
+app = Flask(__name__)
+
+# -------------------- Connexion OVH --------------------
 def get_ovh_connection():
     return swiftclient.Connection(
         user='user-RAqDwcWqKbhS',
@@ -117,9 +120,21 @@ def get_ovh_connection():
         auth_version='3'
     )
 
+# -------------------- Connexion à la base MySQL --------------------
+def get_db_connection():
+    return mysql.connector.connect(
+        host="mh285989-001.eu.clouddb.ovh.net",
+        port=35693,
+        user="bts",
+        password="Harris91270",
+        database="MuslimVibe"
+    )
+
+# -------------------- Route Upload --------------------
 @app.route("/upload", methods=["POST"])
 def upload():
     print("Files received:", request.files)
+    print("Form data:", request.form)
 
     if 'file' not in request.files:
         return jsonify({"error": "Aucun fichier reçu"}), 400
@@ -128,14 +143,85 @@ def upload():
     filename = file.filename
     content = file.read()
 
+    # Récupération des données du formulaire
+    user_id = request.form.get('user_id')
+    content_type = request.form.get('content_type', 'video')  # Par défaut 'video'
+    title = request.form.get('title')
+    description = request.form.get('description')
+    category = request.form.get('category')
+    language = request.form.get('language', 'fr')  # Par défaut 'fr'
+    tags = request.form.get('tags')
+    file_size = len(content)  # Taille du fichier en octets
+
     try:
+        # Upload sur OVH
         conn = get_ovh_connection()
         container = "Muslim.Vibes/Contents"
         conn.put_object(container, filename, contents=content)
-        return jsonify({"message": f"Fichier {filename} envoyé avec succès à OVH."})
+
+        # Enregistrement dans la base MySQL
+        db = get_db_connection()
+        cursor = db.cursor()
+        
+        # Requête SQL avec tous les champs nécessaires
+        sql = """
+        INSERT INTO islamic_content (
+            user_id,
+            file_name,
+            content_type,
+            title,
+            description,
+            category,
+            watch_count,
+            likes_count,
+            comments_count,
+            upload_date,
+            is_active,
+            file_size,
+            duration,
+            thumbnail_url,
+            tags,
+            language,
+            is_featured
+        ) VALUES (
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s
+        )
+        """
+        
+        values = (
+            user_id,           # user_id
+            filename,          # file_name
+            content_type,      # content_type
+            title,            # title
+            description,       # description
+            category,         # category
+            0,               # watch_count (initial)
+            0,               # likes_count (initial)
+            0,               # comments_count (initial)
+            1,               # is_active
+            file_size,       # file_size
+            None,            # duration (à implémenter plus tard)
+            None,            # thumbnail_url (à implémenter plus tard)
+            tags,            # tags
+            language,        # language
+            0                # is_featured (initial)
+        )
+        
+        cursor.execute(sql, values)
+        content_id = cursor.lastrowid
+        db.commit()
+        cursor.close()
+        db.close()
+
+        return jsonify({
+            "message": f"Fichier {filename} envoyé avec succès et ajouté en BDD.",
+            "content_id": content_id
+        })
+
     except Exception as e:
-        return jsonify({"error": f"Erreur lors de l'upload: {str(e)}"}), 500
+        return jsonify({"error": f"Erreur lors de l'upload ou enregistrement BDD : {str(e)}"}), 500
 
 # -------------------- Run --------------------
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8000)
