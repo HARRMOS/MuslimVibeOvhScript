@@ -14,7 +14,9 @@ def get_db_connection():
         password="Harris91270",
         database="MuslimVibe"
     )
-
+@app.route("/")
+def home():
+    return "✅ L'application Flask fonctionne !"
 # Route pour récupérer toutes les vidéos
 @app.route("/getVideos")
 def get_videos():
@@ -99,12 +101,6 @@ def get_likes(content_id):
     cursor.close()
     conn.close()
     return jsonify({"count": count})
-
-import swiftclient
-import mysql.connector
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
 
 # -------------------- Connexion OVH --------------------
 def get_ovh_connection():
