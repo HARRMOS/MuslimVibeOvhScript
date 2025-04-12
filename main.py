@@ -23,7 +23,7 @@ def get_videos():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM `islamic_content`")
+        cursor.execute("SELECT * FROM `islamic_content` ORDER BY RAND()")
         results = cursor.fetchall()
         conn.close()
         return jsonify(results)
