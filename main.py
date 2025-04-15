@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import mysql.connector
 import swiftclient
+from flask_cors import CORS
 
 app = Flask(__name__)
 
