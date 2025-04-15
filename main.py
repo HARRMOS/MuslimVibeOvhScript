@@ -4,7 +4,7 @@ import swiftclient
 from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 # -------------------- Base de Données --------------------
 
 def get_db_connection():
